@@ -1,0 +1,11 @@
+Basic idea is there are a few types of object;
+
+Paddock - (build server connection) - throws events like isDawn, isDusk, isBarren, isLush. Responsible for polling a build server for info.
+
+Yak - (raspberry pi hardware) - reacts by mooing, flashing it's eyes, etc. plays sounds and sets eye colour
+
+YakShaver - (coordinator) - when the paddock raises events, the YakShaver coordinates and commands the yak.
+
+Sun - (clock) - ticks at intervals, and the paddock polls when the ticks occur.
+
+And the lifecycle is this;
