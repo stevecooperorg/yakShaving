@@ -1,10 +1,68 @@
 var yakShaving = require('../src/yakShaving');
 
+//var pigpio = require('pi-gpio');
+
 describe("the yak", function() {
-	it("flashes it's eyes", function() {
-		var yak = yakShaving.Yak();
-		yak.setEyes("off");
+
+	var yak, eyeLog, tongueLog;
+
+	beforeEach(function() {
+		eyeLog = "";
+		tongueLog = "";
+
+		logToTongue = function(file) {
+			if (tongueLog.length > 0) {
+				tongueLog += " - ";
+			}
+			tongueLog += file;			
+		};
+
+		var logToEye = function(msg) {
+			if (eyeLog.length > 0) {
+				eyeLog += " - ";
+			}
+			eyeLog += msg;
+		};
+
+		var eye = { 
+			open: function(pin, mode, func) {
+				logToEye("open pin " + pin + " mode " + mode);
+				if (func) { func(); }
+			},
+			write: function(pin, high, func) {
+				logToEye("write pin " + pin + " high " + high);
+				if (func) { func(); }
+			},
+			close: function(pin, func) {
+				logToEye("close " + pin);
+				if (func) { func(); }
+			}
+		};
 		
+		var tongue = {
+			baseDir: "/usr/src/yakShaving/soundfiles",
+			play: function(sound) {
+				var fullPath = this.baseDir + "/" + sound + ".wav"
+				logToTongue("playing " + fullPath);
+			}
+		};
+
+		yak = yakShaving.Yak(eye, tongue);
+	}) 
+
+	it("is awesome in it's reality and glory", function() {
+		expect(yak).not.toBe(null);
+		expect(yak).not.toBe(undefined);
+	});
+
+	it("flashes it's eyes", function() {
+		yak.setEyes("off");
+		expect(eyeLog).toBe("open pin 16 mode WRITE - write pin 16 high 1 - close 16");
+	});
+
+	it("roars", function() {
+		yak.moos("roar");
+		expect(tongueLog).toBe("playing /usr/src/yakShaving/soundfiles/roar.wav");
 	});
 });
 
@@ -23,7 +81,7 @@ describe("the yakshaver", function() {
     	};
 
     	yak = {
-    		moo: function(sound) {
+    		moos: function(sound) {
     			log("moo! " + sound);
     		},
     		setEyes: function(color) {

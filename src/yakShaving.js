@@ -1,14 +1,20 @@
-var events = require('events');
-//var pigpio = require('pi-gpio');
-var pigpio = require('./mock-pi-gpio');
+//var events = require('events');
 
 var inASecond = function(f) {
 	setTimeout(f, 1000);
 };
 
 var platonicYak = {
-	moo: function() {
-		console.log("moo!");
+	moos: function(sound) {
+		this.tongue.play(sound)
+	},
+	setEyes: function(color) {
+		var eye = this.eye;
+		eye.open(16, "WRITE", function(){
+			eye.write(16, 1, function() {
+				eye.close(16);
+			});
+		});
 	}
 }
 
@@ -25,47 +31,31 @@ var platonicShaver = {
     	this.yak = yak;
     },
     wakeYak: function() {
-    	this.yak.moo("cock crows");
+    	this.yak.moos("cock crows");
     	this.blinkEyes("green");
     },
     angerYak: function() {
     	var yak = this.yak;
-    	yak.moo("angry moo");
+    	yak.moos("angry moo");
     	this.blinkEyes("red");
     }, 
     calmYak: function() {
-    	this.yak.moo("happy moo");
+    	this.yak.moos("happy moo");
     	this.yak.setEyes("green");    	
     },
     putYakToBed: function() {
-    	this.yak.moo("zzz");
+    	this.yak.moos("zzz");
     	this.yak.setEyes("off");
-    },
-    enterPaddock: function(paddock) {
-    	this.paddock = paddock;
     }
 };
 
-
-var meadow = {
-	isBarren: function() {
-		this.ee.emit('isBarren');
-	},
-	acceptShaver: function() {
-		this.ee.on('isBarren', this)
-	}
-};
-
-module.exports.Paddock = function() {
-	var ee = new events.EventEmitter();
-	var paddock = Object.create(meadow);
-	paddock.ee = ee;
-};
-
-module.exports.Yak = function() {
+module.exports.Yak = function(eye, tongue) {
 	var yak = Object.create(platonicYak);
+	yak.eye = eye;
+	yak.tongue = tongue;
+	return yak;
 };
 
 module.exports.YakShaver = function() {
 	return Object.create(platonicShaver);
-}
+};
